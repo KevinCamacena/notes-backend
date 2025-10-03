@@ -1,0 +1,38 @@
+services:
+  mongo:
+    image: mongodb/mongodb-community-server:8.0.14-rc1-ubi8
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mongo-data:/data/db 
+    networks:
+      - notes-network
+
+  mongo-express:
+    image: mongo-express:1.0.2-20-alpine3.19
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_PASSWORD}
+      ME_CONFIG_MONGODB_URL: ${MONGO_URL}
+      ME_CONFIG_BASICAUTH: false
+    depends_on:
+      - mongo 
+    networks:
+      - notes-network
+
+volumes:
+  mongo-data:
+
+networks:
+  notes-network:
+    driver: bridge 
+
