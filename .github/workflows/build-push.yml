@@ -1,0 +1,72 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ "main" ]
+    # MODIFICADO: El trigger ahora coincide con el nuevo formato de tags para entornos.
+    # Ejemplo: v1.0.0-dev.1, v1.2.3-preprod.1, etc.
+    tags: [ 'v*.*.*-*.*' ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+      
+    steps:
+      # Paso 1: Checkout del código del repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Paso 2: Iniciar sesión en Docker Hub usando secrets
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Paso 3: Extraer metadatos de Docker para etiquetado inteligente
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ vars.DOCKERHUB_USERNAME }}/notes-api
+          tags: |
+            # Mantenemos: Crear un tag 'latest' solo al hacer push a la rama 'main'
+            type=raw,value=latest,enable={{is_default_branch}}
+            
+            # MODIFICADO: En lugar de analizar con semver, usamos el tag de Git completo.
+            # Esto creará una etiqueta de Docker idéntica al tag de Git que actives.
+            # Por ejemplo, un tag de Git 'v1.0.0-dev.1' creará una etiqueta de Docker 'v1.0.0-dev.1'.
+            type=ref,event=tags
+            
+            # Opcional: Mantenemos el tag a partir del nombre de la rama (ej. 'main')
+            type=ref,event=branch
+            
+      # Paso 4: Configurar Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Paso 5: Construir, pushear y cachear la imagen de Docker
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          # Solo se hace push en eventos 'push', no en 'pull_request'
+          push: ${{ github.event_name != 'pull_request' }}
+          # Usar los tags generados por la acción de metadatos
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Habilitar caché para acelerar builds subsecuentes
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # Generar procedencia y SBOM para seguridad de la cadena de suministro
+          provenance: true
+          sbom: true

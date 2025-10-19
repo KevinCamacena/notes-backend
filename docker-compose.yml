@@ -29,6 +29,21 @@ services:
     networks:
       - notes-network
 
+  notes-api:
+    build: .
+    image: ${DOCKER_USERNAME}/notes-api:latest
+    container_name: notes-api
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      MONGO_DB_URI: ${MONGO_DB_URI}
+    depends_on:
+      - mongo
+    networks:
+      - notes-network
+
+
 volumes:
   mongo-data:
 

@@ -1,0 +1,37 @@
+name: Create Dev Tag
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag-release:
+    name: Create Dev Tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Se necesita permiso para pushear el nuevo tag
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+      - name: Generate tag name
+        id: generate_tag
+        # Genera un tag único usando la fecha y el número de ejecución del workflow
+        # Ejemplo de salida: v2025.10.19-dev.101
+        run: |
+          TAG="v$(date +'%Y.%m.%d')-dev.${{ github.run_number }}"
+          echo "TAG_NAME=$TAG" >> $GITHUB_OUTPUT
+          
+      - name: Create and push tag
+        run: |
+          TAG_NAME=${{ steps.generate_tag.outputs.TAG_NAME }}
+          echo "Creating tag ${TAG_NAME}"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
