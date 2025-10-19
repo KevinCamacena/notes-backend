@@ -20,6 +20,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.notesapp.notes_api.note.repository.NoteRepository;
+import com.notesapp.notes_api.note.service.NoteService;
+import com.notesapp.notes_api.note.model.Note;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -31,6 +33,9 @@ public class NoteControllerTest {
 
     @Autowired
     private NoteRepository noteRepository;
+
+    @Autowired
+    private NoteService noteService;
 
     @BeforeEach
     void setUp() {
@@ -66,6 +71,21 @@ public class NoteControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].content").value("This is a test note for get all."));
+    }
+
+    @Test
+    void shouldReturnOneNoteById() throws Exception {
+        Note noteToSave = new Note();
+        noteToSave.setContent("This is a the specific note we want!.");
+        Note savedNote = noteService.createNote(noteToSave);
+
+        String savedId = savedNote.getId();
+
+        mockMvc.perform(get("/api/v1/notes/" + savedId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(savedId))
+                .andExpect(jsonPath("$.content").value("This is a the specific note we want!."));
     }
 
 }
