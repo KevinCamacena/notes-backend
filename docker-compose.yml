@@ -31,7 +31,7 @@ services:
 
   notes-api:
     build: .
-    image: kevcam7/notes-api:latest
+    image: ${DOCKER_USERNAME}/notes-api:latest
     container_name: notes-api
     restart: always
     ports:
