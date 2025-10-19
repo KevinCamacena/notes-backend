@@ -41,4 +41,12 @@ public class NoteService {
                 });
     }
 
+    public boolean deleteNoteById(String id) {
+        if (noteRepository.existsById(id)) {
+            noteRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
 }

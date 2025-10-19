@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.emptyString;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -104,6 +105,22 @@ public class NoteControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(savedId))
                 .andExpect(jsonPath("$.content").value("This note has been updated."));
+    }
+
+    @Test
+    void shouldDeleteNoteById() throws Exception {
+        Note noteToSave = new Note();
+        noteToSave.setContent("This is a note to be deleted.");
+        Note savedNote = noteService.createNote(noteToSave);
+        String savedId = savedNote.getId();
+
+        mockMvc.perform(delete("/api/v1/notes/" + savedId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/v1/notes/" + savedId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
 }
