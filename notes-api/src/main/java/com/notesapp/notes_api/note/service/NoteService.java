@@ -32,4 +32,13 @@ public class NoteService {
         return noteRepository.findById(id);
     }
 
+    public Optional<Note> updateNote(String id, Note noteUpdates) {
+        return noteRepository.findById(id)
+                .map(existingNote -> {
+                    existingNote.setContent(noteUpdates.getContent());
+                    existingNote.setUpdatedAt(LocalDateTime.now());
+                    return noteRepository.save(existingNote);
+                });
+    }
+
 }

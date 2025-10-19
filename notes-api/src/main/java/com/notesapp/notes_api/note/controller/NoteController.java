@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,4 +43,11 @@ public class NoteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Note> updateNote(@PathVariable String id, @RequestBody Note noteUpdates) {
+        Optional<Note> updatedNoteOptional = noteService.updateNote(id, noteUpdates);
+        return updatedNoteOptional
+                .map(updatedNote -> ResponseEntity.ok(updatedNote))
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

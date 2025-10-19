@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.emptyString;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -86,6 +87,23 @@ public class NoteControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(savedId))
                 .andExpect(jsonPath("$.content").value("This is a the specific note we want!."));
+    }
+
+    @Test
+    void shouldUpdateNoteById() throws Exception {
+        Note noteToSave = new Note();
+        noteToSave.setContent("This is a note to be updated.");
+        Note savedNote = noteService.createNote(noteToSave);
+        String savedId = savedNote.getId();
+
+        String updatedNoteJson = "{\"content\": \"This note has been updated.\"}";
+
+        mockMvc.perform(put("/api/v1/notes/" + savedId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedNoteJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(savedId))
+                .andExpect(jsonPath("$.content").value("This note has been updated."));
     }
 
 }
