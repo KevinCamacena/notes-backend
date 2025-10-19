@@ -1,0 +1,11 @@
+package com.notesapp.notes_api.note.repository;
+
+import com.notesapp.notes_api.note.model.Note;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface NoteRepository extends MongoRepository<Note, String> {
+    
+}
