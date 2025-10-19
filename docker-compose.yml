@@ -39,7 +39,7 @@ services:
     environment:
       MONGO_DB_URI: ${MONGO_DB_URI}
     depends_on:
-      - mongo-express
+      - mongo
     networks:
       - notes-network
 
