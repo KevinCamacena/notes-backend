@@ -43,7 +43,7 @@ jobs:
             # MODIFICADO: En lugar de analizar con semver, usamos el tag de Git completo.
             # Esto creará una etiqueta de Docker idéntica al tag de Git que actives.
             # Por ejemplo, un tag de Git 'v1.0.0-dev.1' creará una etiqueta de Docker 'v1.0.0-dev.1'.
-            type=ref,event=tags
+            type=ref,event=tag
             
             # Opcional: Mantenemos el tag a partir del nombre de la rama (ej. 'main')
             type=ref,event=branch
