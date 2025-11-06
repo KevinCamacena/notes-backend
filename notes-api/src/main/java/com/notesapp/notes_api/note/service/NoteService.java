@@ -35,8 +35,13 @@ public class NoteService {
     public Optional<Note> updateNote(String id, Note noteUpdates) {
         return noteRepository.findById(id)
                 .map(existingNote -> {
+                    // Actualizamos todos los campos que nos lleguen
                     existingNote.setContent(noteUpdates.getContent());
-                    existingNote.setUpdatedAt(LocalDateTime.now());
+                    existingNote.setBody(noteUpdates.getBody());
+                    existingNote.setColor(noteUpdates.getColor());
+                    existingNote.setPosition(noteUpdates.getPosition());
+                    // (Aquí también podríamos setear un 'updatedAt = LocalDateTime.now()')
+                    
                     return noteRepository.save(existingNote);
                 });
     }

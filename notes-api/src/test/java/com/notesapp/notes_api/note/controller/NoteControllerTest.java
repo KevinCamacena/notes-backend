@@ -123,4 +123,27 @@ public class NoteControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void shouldCreateNewNote() throws Exception {
+        // --- JSON AHORA MÁS COMPLETO ---
+        String newNoteJson = """
+            {
+                "content": "Contenido antiguo (opcional)",
+                "body": "<p>¡Este es el cuerpo de la nota!</p>",
+                "color": "{\\"id\\":\\"color-purple\\",\\"colorHeader\\":\\"#FED0FD\\",\\"colorBody\\":\\"#FEE5FD\\",\\"colorText\\":\\"#18181A\\"}",
+                "position": "{\\"x\\":163,\\"y\\":273}"
+            }
+            """;
+
+        mockMvc.perform(post("/api/v1/notes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newNoteJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", not(emptyString())))
+                // --- NUEVAS AFIRMACIONES ---
+                .andExpect(jsonPath("$.body", is("<p>¡Este es el cuerpo de la nota!</p>")))
+                .andExpect(jsonPath("$.color", is("{\"id\":\"color-purple\",\"colorHeader\":\"#FED0FD\",\"colorBody\":\"#FEE5FD\",\"colorText\":\"#18181A\"}")))
+                .andExpect(jsonPath("$.position", is("{\"x\":163,\"y\":273}")));
+    }
+
 }

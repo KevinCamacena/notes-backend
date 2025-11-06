@@ -3,3 +3,7 @@
 .vscode/
 
 application-local.properties
+
+# Logs
+logs.txt
+logs/
